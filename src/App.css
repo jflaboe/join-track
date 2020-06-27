@@ -2,6 +2,17 @@
   text-align: center;
 }
 
+.title {
+  font-size: 7vw;
+}
+
+.main {
+  height: "100vh";
+}
+.muiForm {
+  margin-bottom: 3vh;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
