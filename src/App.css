@@ -2,13 +2,29 @@
   text-align: center;
 }
 
+
 .title {
-  font-size: 7vw;
+  font-size: 7vw
 }
 
 .description {
   font-size: 3vw;
+  font-weight: 400;
 }
+
+@media screen and (min-width: 1000px){
+  .title {
+    font-size: 48px;
+  }
+
+  .description {
+    font-size: 30px;
+    font-weight: 400;
+  }
+}
+
+
+
 
 .main {
   height: "100vh";
