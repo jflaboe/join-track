@@ -137,7 +137,7 @@ function App() {
         </Grid>
         {/*start of mike's changes*/}
         <Grid item>
-          <h2 align='center' className='description'>Welcome to NUTC! When you sign up for the Listserv, you'll receive emails for weekly workouts, meet signups, and other events the club hosts. </h2>
+          <h2 align='center' className="description">Welcome to NUTC! When you sign up for the Listserv, you'll receive emails for weekly workouts, meet signups, and other events the club hosts. </h2>
         </Grid>
         {/*end of mike's changes*/}
         <Grid item>
