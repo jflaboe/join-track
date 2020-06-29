@@ -135,6 +135,11 @@ function App() {
         <Grid item>
           <h1 align='center' className="title">Northwestern Track Club</h1>
         </Grid>
+        {/*start of mike's changes*/}
+        <Grid item>
+          <h2 align='center' className='description'>Welcome to NUTC! When you sign up for the Listserv, you'll receive emails for weekly workouts, meet signups, and other events the club hosts. </h2>
+        </Grid>
+        {/*end of mike's changes*/}
         <Grid item>
           <Grid container direction="column" alignItems="space-evenly" className='muiForm'>
             <Grid item>

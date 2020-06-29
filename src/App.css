@@ -6,6 +6,10 @@
   font-size: 7vw;
 }
 
+.description {
+  font-size: 3vw;
+}
+
 .main {
   height: "100vh";
 }
