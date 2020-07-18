@@ -10,12 +10,13 @@
     "gapi-script": "^1.0.2",
     "js-base64": "^2.6.1",
     "react": "^16.13.1",
+    "react-app-env": "^1.2.3",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-app-env --env-file=config/test.env start",
+    "build": "react-app-env --env-file=config/production.env build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
