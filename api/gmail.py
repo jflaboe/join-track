@@ -65,7 +65,10 @@ def post_js_gm():
             }
         ]
     }
-    r2 = requests.post("https://api.groupme.com/v3/groups/60786308/members/add?token=81074000d5b4013710310a666913ee8d", data=add_obj)
+    r2 = requests.post("https://api.groupme.com/v3/groups/60786308/members/add?token=81074000d5b4013710310a666913ee8d", data=json.dumps(add_obj))
+
+    print(r2)
+    print(r2.content)
 
     resp = make_response("Success", 200)
     resp.headers['Access-Control-Allow-Origin'] = '*'
