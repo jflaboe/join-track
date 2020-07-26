@@ -68,14 +68,11 @@ function App() {
     var userData = {
       'userId': userId,
       'googleAccessToken': googleAccessToken, 
-      'gmAccessToken': gmAccessToken
+      'gmAccessToken': gmToken
     };
     fetch("http://localhost:3001/addtogroupme",
-      {method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
+      {
+      method: 'POST',
       body: JSON.stringify(userData)
       }
     ) 
