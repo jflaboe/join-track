@@ -65,7 +65,26 @@ function App() {
     const googleAccessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true).access_token;
     console.log(gmToken);
     console.log(API_ENDPOINT);
-  }
+    var userData = {
+      'userId': userId,
+      'googleAccessToken': googleAccessToken, 
+      'gmAccessToken': gmToken
+    };
+    fetch("http://localhost:3001/addtogroupme",
+      {
+      method: 'POST',
+      body: JSON.stringify(userData)
+      }
+    ) 
+      .then(resp => resp.json())
+      .then(() => {
+        console.log('Success');
+      });
+      
+
+    //if (resp.ok)
+      //console.log("Sucessfully added to GroupMe");
+  } 
 
   useEffect(() => {
     gapi.load('client:auth2', function() {
