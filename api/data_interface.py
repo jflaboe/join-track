@@ -3,15 +3,18 @@ from sqlite3 import Error
 import json
 import datetime
 
-#DATABASE_FILE = "jointrack.db"
-DATABASE_FILE = ":memory:" #useful for testing
+DATABASE_FILE = "jointrack.db"
 
 class DataInterface:
-    def __init__(self):
+    def __init__(self, test=False):
         self.is_connected = False
+        if test is True:
+            self.db = ":memory:"
+        else:
+            self.db = DATABASE_FILE
         try:
             #connects to the database
-            self.conn = sqlite3.connect(DATABASE_FILE)
+            self.conn = sqlite3.connect(self.db)
             self.is_connected = True
             self.create_db()
         except Exception as e:
@@ -118,41 +121,3 @@ class DataInterface:
         result = self.conn.cursor().execute(query, {'id': user_id, 'id_type': ban_type}).fetchone()
         return result is not None
 
-##
-##TESTING in local memory
-##
-testing = DataInterface()
-
-#admin actions
-admin1 = 'mikeluvin@u.northwestern.edu'
-admin2 = 'johnlaboe@u.northwestern.edu'
-testing.add_admin(admin1)
-testing.add_admin(admin2)
-print(testing.list_admin())
-testing.remove_admin(admin2)
-print(testing.list_admin())
-print(testing.is_admin(admin1))
-print(testing.is_admin('adamforrest@u.northwestern.edu'))
-print(testing.is_admin(3))
-
-#add events
-testing.add_event(admin1, 12345)
-testing.add_event(admin2, 67890)
-print(testing.list_events())
-
-#blacklist actions
-blist1 = 'mattschilling@u.northwestern.edu' #sorrynotsorry
-blist2 = 'ianwallace@u.northwestern.edu'
-blist3 = 'hi'
-testing.add_to_blacklist(blist1)
-testing.add_to_blacklist(blist2)
-testing.add_to_blacklist(blist3, 'other')
-print(testing.list_blacklist())
-print(testing.is_blacklisted(blist1))
-print(testing.is_blacklisted(blist3))
-print(testing.is_blacklisted(blist3, 'other'))
-print(testing.is_blacklisted(admin1))
-testing.remove_from_blacklist(blist2)
-testing.remove_from_blacklist(blist3)
-testing.remove_from_blacklist(admin1)
-print(testing.list_blacklist())
