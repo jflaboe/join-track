@@ -4,12 +4,52 @@
 
 
 .title {
-  font-size: 7vw
+  font-size: 6vw;
+  color: rgb(255, 255 ,255);
+  font-family: Roboto;
+  padding: 3%;
+  background-color: rgba(110, 2, 250, 0.7);
+  border-radius: 2%;
+  margin-left: 10vw;
+  margin-right: 10vw;
 }
 
+#root {
+  background-attachment: fixed;
+  background-image: url("./nutc1_cropped.jpg");
+  background-size: cover;
+  height: 100vh;
+  background-position: center;
+  width: 100vw;
+}
+.MuiTextField-root { 
+  background-color: rgba(255,255,255, 0.7) !important;
+ }
+
+ .MuiStepper-root {
+   position: fixed;
+   bottom: 0;
+   left: 0;
+   right: 0;
+   background-color: rgba(0,0,0,0) !important;
+   color: white;
+ }
+
+ .MuiDialog-root {
+   padding: 2px;
+ }
+
 .description {
-  font-size: 3vw;
+  font-size: 2.5vh;
+  padding-top: 1vh;
+  padding-right: 2px;
+  padding-left: 2px;
+  padding-bottom: 1vh;
   font-weight: 400;
+  background-color: rgba(200, 200, 200, 0.9);
+  color: rgb(74, 0, 172);
+  border-radius: 5px;
+  margin-bottom: 8vh;
 }
 
 @media screen and (min-width: 1000px){
