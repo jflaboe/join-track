@@ -18,10 +18,12 @@ function joinGroupMe(gmToken, callback){
       body: JSON.stringify(userData)
       }
     ) 
-      .then(resp => resp.json())
-      .then(() => {
-        callback()
-        console.log('Success');
+      
+      .then((resp) => {
+        if (resp.ok){
+          callback()
+          console.log('Success');
+        } 
       });
       
 

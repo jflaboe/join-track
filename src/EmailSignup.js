@@ -38,7 +38,7 @@ export default function EmailSignup(props) {
               </Grid>
               <Grid container direction="column" alignItems="center" className='muiForm'>
                 <Grid item>
-                <Button onClick={() => {joinListserv(firstName, lastName, () => {props.setSignedUpForListServ(true); setCookie('listServ', 'yes', 1);})}} variant='outlined'>Join the Listserv</Button>
+                <Button onClick={() => {joinListserv(firstName, lastName, props.onCompletion)}} variant='outlined'>Join the Listserv</Button>
                 </Grid>
               </Grid> 
               
