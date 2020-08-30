@@ -4,6 +4,11 @@ import { createEmail } from './EmailUtil'
 const API_ENDPOINT = process.env.REACT_APP_ENDPOINT
 
 function joinGroupMe(gmToken, callback){
+  if (!gapi.auth2.getAuthInstance().isSignedIn.get()) {
+      
+    gapi.auth2.getAuthInstance().signIn().then(() => {joinGroupMe(gmToken, callback)})
+    return
+  }
     const userId = gapi.auth2.getAuthInstance().currentUser.get().getId();
     const googleAccessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true).access_token;
     
