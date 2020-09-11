@@ -14,6 +14,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ClearIcon from '@material-ui/icons/Clear';
 import IMLeaguesScreen from './IMLeaguesScreen';
 import PrivacyPolicy from './PrivacyPolicy';
+import Admin from './Admin';
 
 const CLIENT_ID = '192540793955-ptloq8bg4d7s8drel47qqmq7kdchdjfl.apps.googleusercontent.com';
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest"];
@@ -91,7 +92,7 @@ function App() {
           <PrivacyPolicy />
         </Route>
         <Route path="/admin">
-          <div></div>
+          <Admin />
         </Route>
         <Route path="/">
         <Stepper activeStep={stepsCompleted} alternativeLabel>

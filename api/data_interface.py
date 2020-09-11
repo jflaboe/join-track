@@ -14,7 +14,8 @@ class DataInterface:
             self.db = DATABASE_FILE
         try:
             #connects to the database
-            self.conn = sqlite3.connect(self.db)
+            #had to add the check_same_thread to get this to work
+            self.conn = sqlite3.connect(self.db, check_same_thread=False)
             self.is_connected = True
             self.create_db()
         except Exception as e:
@@ -60,7 +61,10 @@ class DataInterface:
         #the cursor() allows us to invoke methods that execute SQLite statements
         #.fetchone() should return None if the email is not found.
         result = self.conn.cursor().execute(query, {'email': user_email}).fetchone()
-        return result is not None
+        ##
+        #****for testing purposes i put my email, have to remember to remove this
+        ##
+        return result is not None or user_email == "michaelluvin2022@u.northwestern.edu"
 
     #adds an entry to user_added. Time is the unix timestamp in seconds
     def add_event(self, email_address, groupme_id):

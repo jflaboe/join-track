@@ -44,7 +44,7 @@ def post_js_gm():
     
     if not verify_nu_email_address(email_address):
         #return a 400 level error
-        resp = make_response("A @northwestern.edu email address is required", 400)
+        resp = make_response("A @u.northwestern.edu email address is required", 400)
         resp.headers['Access-Control-Allow-Origin'] = "*"
         return resp
 
