@@ -19,6 +19,8 @@ export default function Admin() {
     const [addBlId, setAddBlId] = useState("");
     const [addBlType, setAddBlType] = useState("");
     const [removeBlId, setRemoveBlId] = useState("");
+    const [eventInfo, setEventInfo] = useState([]);
+    const [eventDialogOpen, setEventDialogOpen] = useState(false);
 
     async function isAdmin() {
       if (!gapi.auth2.getAuthInstance().isSignedIn.get()) {
@@ -50,6 +52,9 @@ export default function Admin() {
         console.log(verified);
         setVerifiedAdmin(verified);
         setDialogOpen(!verified);
+        if (!verified) {
+          gapi.auth2.getAuthInstance().signOut();
+        }
       } else {
         alert("HTTP-Error: " + resp.status)
       };  
@@ -157,6 +162,18 @@ export default function Admin() {
         }; 
       }
     }
+
+    async function listEvents() {
+      var resp = await fetch(API_ENDPOINT + "/listevents");
+      if (resp.ok) {
+        console.log('Success');
+        var events = await resp.json();
+        setEventInfo(events);
+        setEventDialogOpen(true);
+      } else {
+        alert('HTTP-Error:' + resp.status);
+      }
+    }
   
 
     return (
@@ -249,6 +266,21 @@ export default function Admin() {
               </Grid>
             </Grid>
           </Grid>
+          <Grid container direction="column" alignItems="flex-start" spacing={1}>
+            <Grid item>
+              <h3>User Events</h3>
+            </Grid>
+            <Grid item>
+              <Grid container direction="row" alignItems="center" spacing={2} justify-content="space-evenly">
+                <Grid item>
+                 View User List:
+                </Grid>
+                <Grid item>
+                  <Button color="primary" variant="contained" onClick={listEvents}>View User List</Button>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
           </Grid>
         )}
         </Grid>
@@ -323,6 +355,36 @@ export default function Admin() {
             <Button color="primary" variant='contained' onClick={() => setBlDialogOpen(false)}>Close</Button>
           </DialogActions>
         </Dialog>
+
+        <Dialog open={eventDialogOpen} onClose={()=>{setEventDialogOpen(false)}}>
+          <DialogTitle>Page Users</DialogTitle>
+          <DialogContent>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="left">Email</TableCell>
+                    <TableCell align="left">GM ID</TableCell>
+                    <TableCell align="left">Timestamp</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {eventInfo.map((row, i) => (
+                    <TableRow key={i}>
+                      <TableCell align="left">{row[0]}</TableCell>
+                      <TableCell align="left">{row[1]}</TableCell>
+                      <TableCell align="left">{row[2]}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+          <DialogActions>
+            <Button color="primary" variant='contained' onClick={() => setEventDialogOpen(false)}>Close</Button>
+          </DialogActions>
+        </Dialog>
+
       </Container>
     )
 }

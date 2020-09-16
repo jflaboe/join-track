@@ -8,6 +8,18 @@ app = Flask(__name__)
 
 DATABASE = DataInterface(test=True)
 
+def getGmId(access_token):
+    user_info = requests.get("https://api.groupme.com/v3/users/me?token={}".format(gm_access_token)).json()['response']
+    #should prob check to make sure we get valid info
+    print(user_info)
+    try:
+        gm_id = user_info['id']
+    except:
+        resp = make_response("Could not fetch GroupMe ID from GM API", 400)
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return resp
+    return gm_id
+
 @app.route('/verifyadmin', methods = ['POST', 'OPTIONS'])
 def verifyAdmin():
     if request.method == 'OPTIONS':
@@ -117,6 +129,67 @@ def remFromBlacklist():
 
     DATABASE.remove_from_blacklist(user_id)
     resp = make_response("Success", 200)
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
+
+@app.route('/isblacklisted', methods = ['POST', 'OPTIONS'])
+def isBlacklisted():
+    if request.method == 'OPTIONS':
+        resp = make_response("Proceed", 200)
+        resp.headers['Access-Control-Allow-Origin'] = "*"
+        return resp
+
+    print(json.loads(request.data))
+    
+    req_data = json.loads(request.data)
+    try:
+        user_id = req_data['userId']
+        id_type = req_data['idType']
+    except:
+        resp = make_response("The following fields are required: userID, idType", 400)
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return resp
+    
+    if id_type == "groupme ID":
+        #then, the user id is actually the GM access token
+        actual_id = getGmId(user_id)
+    else:
+        actual_id = user_id
+
+    result = DATABASE.is_blacklisted(user_id, ban_type=id_type)
+    print(result)
+    resp = make_response(json.dumps(result), 200)
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
+
+@app.route('/addevent', methods = ['POST', 'OPTIONS'])
+def addEvent():
+    if request.method == 'OPTIONS':
+        resp = make_response("Proceed", 200)
+        resp.headers['Access-Control-Allow-Origin'] = "*"
+        return resp
+
+    print(json.loads(request.data))
+    
+    req_data = json.loads(request.data)
+    try:
+        user_id = req_data['userId']
+        goog_token = req_data['googleAccessToken']
+        gm_token = req_data['gmToken']
+    except:
+        resp = make_response("The following fields are required: userId, googleAccessToken, gmToken", 400)
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return resp
+    
+    email_address = get_email_address(user_id, goog_token)
+    gm_id = getGmId(gm_token)
+    DATABASE.add_event(email_address, gm_id)
+    print(DATABASE.list_events())
+
+@app.route('/listevents', methods = ['GET'])
+def listEvents():
+    events = DATABASE.list_events()
+    resp = make_response(json.dumps(events), 200)
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
 

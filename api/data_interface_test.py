@@ -51,13 +51,14 @@ class TestDataInterface(unittest.TestCase):
         admin1 = 'mikeluvin@u.northwestern.edu'
 
         db.add_to_blacklist(blist1)
-        db.add_to_blacklist(blist2)
+        db.add_to_blacklist(blist2, "email")
         db.add_to_blacklist(blist3, 'other')
         print(db.list_blacklist())
         self.assertTrue(db.is_blacklisted(blist1))
         self.assertFalse(db.is_blacklisted(blist3))
         self.assertTrue(db.is_blacklisted(blist3, 'other'))
         self.assertFalse(db.is_blacklisted(admin1))
+        self.assertTrue(db.is_blacklisted(blist2, "email"))
 
         #remove from blacklist
         db.remove_from_blacklist(blist2)
