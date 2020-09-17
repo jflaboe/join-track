@@ -16,9 +16,9 @@ import IMLeaguesScreen from './IMLeaguesScreen';
 import PrivacyPolicy from './PrivacyPolicy';
 import Admin from './Admin';
 
-const CLIENT_ID = '192540793955-ptloq8bg4d7s8drel47qqmq7kdchdjfl.apps.googleusercontent.com';
+const CLIENT_ID = '718115425321-94nlnnkd8jr70gq4aaetg404eja4hskp.apps.googleusercontent.com';
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest"];
-const SCOPES = 'https://www.googleapis.com/auth/gmail.compose';
+const SCOPES = 'https://www.googleapis.com/auth/userinfo.profile';
 
 
 

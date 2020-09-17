@@ -45,9 +45,9 @@ async function joinGroupMe(gmToken, callback){
 function joinListserv(firstName, lastName, callback) {
     const listServSubscribe =  () => {
 
-      
       const userId = gapi.auth2.getAuthInstance().currentUser.get().getId();
       const googleAccessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true).access_token;
+<<<<<<< HEAD
       console.log(gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true));
 
       gapi.client.gmail.users.getProfile({ 'userId': userId }).execute(async (response) => {
@@ -76,23 +76,32 @@ function joinListserv(firstName, lastName, callback) {
           alert("You must use your @u.northwestern.edu email")
           gapi.auth2.getAuthInstance().signOut()
           return
-        }
-        request.execute((response) => {
-          var request2 = gapi.client.gmail.users.drafts.send({
-            'userId': userId,
-            'resource': {
-              'id': response.id
-            }
-          });
-          request2.execute((resp2) => {
-            console.log(resp2);
-            callback()
-            
-            
-          })
+=======
 
-        })
-      });
+      var userData = {
+        'user_id': userId,
+        'access_token': googleAccessToken,
+        'first': firstName,
+        'last': lastName 
+      };
+      fetch(API_ENDPOINT + "/addtolistserv",
+        {
+        method: 'POST',
+        body: JSON.stringify(userData)
+>>>>>>> 0ac3078eb69d1320a3709167b220262fc774ed15
+        }
+      ) 
+        
+        .then((resp) => {
+          if (resp.ok){
+            callback()
+            console.log('Success');
+          } 
+        });
+
+      
+      
+
     }
     if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
       
