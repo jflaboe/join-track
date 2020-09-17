@@ -12,7 +12,8 @@ import img from './nutc1_cropped.jpg';
 import theme from './Palette';
 import MenuIcon from '@material-ui/icons/Menu';
 import ClearIcon from '@material-ui/icons/Clear';
-import IMLeaguesScreen from './IMLeaguesScreen'
+import IMLeaguesScreen from './IMLeaguesScreen';
+import PrivacyPolicy from './PrivacyPolicy';
 
 const CLIENT_ID = '718115425321-94nlnnkd8jr70gq4aaetg404eja4hskp.apps.googleusercontent.com';
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest"];
@@ -76,14 +77,19 @@ function App() {
       <Drawer anchor="left" open={menuOpen}>
         <Button onClick={()=>{setMenuOpen(!menuOpen)}}><ClearIcon color="primary"/></Button>
         <List>
-        <ListItem button onClick={()=>{window.history.pushState({}, "Join Track", window.location.href); window.location.replace('https://sites.northwestern.edu/runners/')}}><ListItemText primary="Learn More about NUTC"/></ListItem>
+          <ListItem button onClick={()=>{window.history.pushState({}, "Join Track", window.location.href); window.location.replace('https://sites.northwestern.edu/runners/')}}><ListItemText primary="Learn More about NUTC"/></ListItem>
+          <ListItem button onClick={()=>{window.history.pushState({}, "Join Track", window.location.href); window.location.replace('/')}}><ListItemText primary="Home" /></ListItem>
           <ListItem button onClick={()=>{window.history.pushState({}, "Join Track", window.location.href); window.location.replace('/admin')}}><ListItemText primary="Admin"/></ListItem>
+          <ListItem button onClick={()=>{window.history.pushState({}, "Join Track", window.location.href); window.location.replace('/privacy-policy')}}><ListItemText primary="Privacy Policy" /></ListItem>
           <ListItem button onClick={restart}><ListItemText primary="Restart Signup"/></ListItem>
         </List>
       </Drawer>
       <Fab onClick={()=>{setMenuOpen(!menuOpen)}}><MenuIcon color="primary"/></Fab>
     <Router>
       <Switch>
+        <Route path="/privacy-policy">
+          <PrivacyPolicy />
+        </Route>
         <Route path="/admin">
           <div></div>
         </Route>

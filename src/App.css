@@ -52,6 +52,17 @@
   margin-bottom: 8vh;
 }
 
+.policy {
+  font-size: 2vh;
+  padding-top: 1vh;
+  padding-right: 2px;
+  padding-left: 2px;
+  padding-bottom: 1vh;
+  background-color: rgba(200, 200, 200, 0.9);
+  color: rgb(74, 0, 172);
+  border-radius: 5px;
+}
+
 @media screen and (min-width: 1000px){
   .title {
     font-size: 48px;
