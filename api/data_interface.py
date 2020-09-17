@@ -61,10 +61,7 @@ class DataInterface:
         #the cursor() allows us to invoke methods that execute SQLite statements
         #.fetchone() should return None if the email is not found.
         result = self.conn.cursor().execute(query, {'email': user_email}).fetchone()
-        ##
-        #****for testing purposes i put my email, have to remember to remove this
-        ##
-        return result is not None or user_email == "michaelluvin2022@u.northwestern.edu"
+        return result is not None
 
     #adds an entry to user_added. Time is the unix timestamp in seconds
     def add_event(self, email_address, groupme_id):

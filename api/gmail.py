@@ -6,10 +6,7 @@ from data_interface import *
 
 app = Flask(__name__)
 
-DATABASE = DataInterface(test=True)
-
-#how to run on localhost:3001
-#python -m flask run -h 'localhost' -p 3001
+DATABASE = DataInterface()
 
 def get_email_address(access_token):
     resp = requests.get("https://www.googleapis.com/oauth2/v1/userinfo?alt=json", headers={"Authorization": "Bearer {}".format(access_token)})

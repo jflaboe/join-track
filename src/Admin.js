@@ -3,9 +3,7 @@ import { gapi } from 'gapi-script';
 import { Container, Grid, Button, TextField, withStyles, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, 
   Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Paper, Typography } from '@material-ui/core';
 
-//**for testing**
-// const API_ENDPOINT = process.env.REACT_APP_ENDPOINT
-const API_ENDPOINT = "http://localhost:3001";
+const API_ENDPOINT = process.env.REACT_APP_ENDPOINT
 
 
 export default function Admin() {

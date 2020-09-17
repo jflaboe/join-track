@@ -1,8 +1,7 @@
 import { gapi } from 'gapi-script';
 import { createEmail } from './EmailUtil'
 
-//const API_ENDPOINT = process.env.REACT_APP_ENDPOINT;
-const API_ENDPOINT = "http://localhost:3001";
+const API_ENDPOINT = process.env.REACT_APP_ENDPOINT;
 
 function joinGroupMe(gmToken, callback){
   if (!gapi.auth2.getAuthInstance().isSignedIn.get()) {
