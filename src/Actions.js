@@ -39,45 +39,32 @@ function joinGroupMe(gmToken, callback){
 function joinListserv(firstName, lastName, callback) {
     const listServSubscribe =  () => {
 
-      
       const userId = gapi.auth2.getAuthInstance().currentUser.get().getId();
-      console.log(gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true));
+      const googleAccessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true).access_token;
 
-      gapi.client.gmail.users.getProfile({ 'userId': userId }).execute((response) => {
-        console.log(response)
-        var request = gapi.client.gmail.users.drafts.create({
-          'userId': userId,
-          'resource': {
-            'message': {
-              'raw': createEmail(
-                "listserv@listserv.it.northwestern.edu",
-                response.emailAddress,
-                "",
-                "SUBSCRIBE TRACK " + firstName + " " + lastName
-              )
-            }
-          }
-        });
-        if (!response.emailAddress.includes("northwestern.edu")) {
-          gapi.auth2.getAuthInstance().signOut()
-          return
+      var userData = {
+        'user_id': userId,
+        'access_token': googleAccessToken,
+        'first': firstName,
+        'last': lastName 
+      };
+      fetch(API_ENDPOINT + "/addtolistserv",
+        {
+        method: 'POST',
+        body: JSON.stringify(userData)
         }
-        request.execute((response) => {
-          var request2 = gapi.client.gmail.users.drafts.send({
-            'userId': userId,
-            'resource': {
-              'id': response.id
-            }
-          });
-          request2.execute((resp2) => {
-            console.log(resp2);
+      ) 
+        
+        .then((resp) => {
+          if (resp.ok){
             callback()
-            
-            
-          })
+            console.log('Success');
+          } 
+        });
 
-        })
-      });
+      
+      
+
     }
     if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
       
