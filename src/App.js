@@ -14,9 +14,9 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ClearIcon from '@material-ui/icons/Clear';
 import IMLeaguesScreen from './IMLeaguesScreen'
 
-const CLIENT_ID = '1087799332107-pj33egdhuog61uuqjgrk5cldmhugfo1e.apps.googleusercontent.com';
+const CLIENT_ID = '718115425321-94nlnnkd8jr70gq4aaetg404eja4hskp.apps.googleusercontent.com';
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest"];
-const SCOPES = 'https://www.googleapis.com/auth/gmail.compose';
+const SCOPES = 'https://www.googleapis.com/auth/userinfo.profile';
 
 
 

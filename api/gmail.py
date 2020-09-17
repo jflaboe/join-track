@@ -1,6 +1,7 @@
 import requests
 import json
 from flask import Flask, request, make_response
+import private_gmail
 
 app = Flask(__name__)
 
@@ -8,14 +9,53 @@ app = Flask(__name__)
 #python -m flask run -h 'localhost' -p 3001
 
 def get_email_address(user_id, access_token):
-    resp = requests.get("https://www.googleapis.com/gmail/v1/users/{}/profile".format(user_id), headers={"Authorization": "Bearer {}".format(access_token)})
+    resp = requests.get("https://www.googleapis.com/oauth2/v1/userinfo?alt=json", headers={"Authorization": "Bearer {}".format(access_token)})
     content = json.loads(resp.content)
     print(content)
-    return content['emailAddress']
+    return content['email']
     
 
 def verify_nu_email_address(user_email):
     return user_email.endswith("@u.northwestern.edu")
+
+
+@app.route('/addtolistserv', methods = ['POST', 'OPTIONS'])
+def add_to_listserv():
+    if request.method == 'OPTIONS':
+        resp = make_response("Proceed", 200)
+        resp.headers['Access-Control-Allow-Origin'] = "*"
+        return resp
+    print(json.loads(request.data))
+    req_data = json.loads(request.data)
+
+    
+    
+
+    try:
+        user_id = req_data['user_id']
+        access_token = req_data['access_token']
+        first = req_data['first']
+        last = req_data['last']
+
+        email = get_email_address(user_id, access_token)
+        if verify_nu_email_address(email) is False:
+            raise Exception("Not a northwestern email")
+
+        result = private_gmail.send_email(email, first, last)
+        if result is None:
+            raise Exception('failed to send message')
+
+        resp = make_response("Email success", 200)
+        resp.headers['Access-Control-Allow-Origin'] = "*"
+        return resp
+    
+    except Exception as e:
+        print(e)
+        resp = make_response("Auth failed", 404)
+        resp.headers['Access-Control-Allow-Origin'] = "*"
+        return resp
+
+
 
 @app.route('/addtogroupme', methods = ['POST', 'OPTIONS'])
 def post_js_gm():
