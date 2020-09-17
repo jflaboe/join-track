@@ -8,7 +8,7 @@ app = Flask(__name__)
 #how to run on localhost:3001
 #python -m flask run -h 'localhost' -p 3001
 
-def get_email_address(user_id, access_token):
+def get_email_address(access_token):
     resp = requests.get("https://www.googleapis.com/oauth2/v1/userinfo?alt=json", headers={"Authorization": "Bearer {}".format(access_token)})
     content = json.loads(resp.content)
     print(content)
@@ -37,7 +37,7 @@ def add_to_listserv():
         first = req_data['first']
         last = req_data['last']
 
-        email = get_email_address(user_id, access_token)
+        email = get_email_address(access_token)
         if verify_nu_email_address(email) is False:
             raise Exception("Not a northwestern email")
 
@@ -79,7 +79,7 @@ def post_js_gm():
         return resp
     
     
-    email_address = get_email_address(user_id, goog_access_token)
+    email_address = get_email_address(goog_access_token)
 
     
     if not verify_nu_email_address(email_address):
