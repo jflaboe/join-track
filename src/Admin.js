@@ -30,11 +30,9 @@ export default function Admin() {
       }
   
       //make an HTTP POST request to the Flask server to determine if the user is an admin
-      const userId = gapi.auth2.getAuthInstance().currentUser.get().getId();
       const googleAccessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true).access_token;
       
       var userData = {
-        'userId': userId,
         'googleAccessToken': googleAccessToken
       };
       var resp = await fetch(API_ENDPOINT + "/verifyadmin",
@@ -60,8 +58,19 @@ export default function Admin() {
       };  
     }
 
+    //sending the google access token to verify that the user is an admin for
+    //every request
     async function viewAdmin() {
-      var resp = await fetch(API_ENDPOINT + "/viewadmin")
+      const googleAccessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true).access_token;
+      var userData = {
+        'googleAccessToken': googleAccessToken
+      };
+      var resp = await fetch(API_ENDPOINT + "/viewadmin",
+        {
+          method: 'POST',
+          body: JSON.stringify(userData)
+        }
+      )
 
       if (resp.ok) {
         console.log("Success");
@@ -77,13 +86,15 @@ export default function Admin() {
       if (addAdminName == "" || !addAdminName.endsWith("@u.northwestern.edu")) {
         alert("Please input a valid @u.northwestern.edu email.");
       } else {
+        const googleAccessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true).access_token;
         var userData = {
+          'googleAccessToken': googleAccessToken,
           'userEmail': addAdminName
         }
         var resp = await fetch(API_ENDPOINT + "/addadmin",
           {
-          method: 'POST',
-          body: JSON.stringify(userData)
+            method: 'POST',
+            body: JSON.stringify(userData)
           }
         ) 
         
@@ -99,7 +110,15 @@ export default function Admin() {
     }
 
     async function viewBlacklist() {
-      var resp = await fetch(API_ENDPOINT + "/viewblacklist")
+      const googleAccessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true).access_token;
+      var userData = {
+        'googleAccessToken': googleAccessToken
+      }
+      var resp = await fetch(API_ENDPOINT + "/viewblacklist",
+        {
+          method: "POST",
+          body: JSON.stringify(userData)
+        });
 
       if (resp.ok) {
         console.log("Success");
@@ -115,7 +134,9 @@ export default function Admin() {
       if (addBlId == "" || addBlType == "") {
         alert("Please input an ID and ID type.");
       } else {
+        const googleAccessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true).access_token;
         var userData = {
+          'googleAccessToken': googleAccessToken,
           'userID': addBlId,
           'idType': addBlType
         }
@@ -142,7 +163,9 @@ export default function Admin() {
       if (removeBlId == "" ) {
         alert("Please input an ID to remove.");
       } else {
+        const googleAccessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true).access_token;
         var userData = {
+          'googleAccessToken': googleAccessToken,
           'userID': removeBlId
         }
         var resp = await fetch(API_ENDPOINT + "/remfromblacklist",
@@ -164,7 +187,15 @@ export default function Admin() {
     }
 
     async function listEvents() {
-      var resp = await fetch(API_ENDPOINT + "/listevents");
+      const googleAccessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true).access_token;
+      var userData = {
+        'googleAccessToken': googleAccessToken
+      }
+      var resp = await fetch(API_ENDPOINT + "/listevents",
+        {
+          method: "POST",
+          body: JSON.stringify(userData)          
+        });
       if (resp.ok) {
         console.log('Success');
         var events = await resp.json();
