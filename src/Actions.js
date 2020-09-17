@@ -1,7 +1,7 @@
 import { gapi } from 'gapi-script';
 import { createEmail } from './EmailUtil'
 
-const API_ENDPOINT = process.env.REACT_APP_ENDPOINT
+const API_ENDPOINT = process.env.REACT_APP_ENDPOINT;
 
 function joinGroupMe(gmToken, callback){
   if (!gapi.auth2.getAuthInstance().isSignedIn.get()) {
@@ -9,11 +9,10 @@ function joinGroupMe(gmToken, callback){
     gapi.auth2.getAuthInstance().signIn().then(() => {joinGroupMe(gmToken, callback)})
     return
   }
-    const userId = gapi.auth2.getAuthInstance().currentUser.get().getId();
+    
     const googleAccessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true).access_token;
     
     var userData = {
-      'userId': userId,
       'googleAccessToken': googleAccessToken, 
       'gmAccessToken': gmToken
     };
@@ -28,7 +27,11 @@ function joinGroupMe(gmToken, callback){
         if (resp.ok){
           callback()
           console.log('Success');
-        } 
+        } else if (resp.status === 403) {
+          alert("You are not authorized to use this page due to past behavior")
+        } else {
+          alert("HTTP-Error:" + resp.status)
+        }
       });
       
 
@@ -39,11 +42,9 @@ function joinGroupMe(gmToken, callback){
 function joinListserv(firstName, lastName, callback) {
     const listServSubscribe =  () => {
 
-      const userId = gapi.auth2.getAuthInstance().currentUser.get().getId();
       const googleAccessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true).access_token;
 
       var userData = {
-        'user_id': userId,
         'access_token': googleAccessToken,
         'first': firstName,
         'last': lastName 
@@ -59,7 +60,11 @@ function joinListserv(firstName, lastName, callback) {
           if (resp.ok){
             callback()
             console.log('Success');
-          } 
+          } else if (resp.status === 403) {
+            alert("You are not authorized to use this page due to past behavior")
+          } else {
+            alert("HTTP-Error:" + resp.status)
+          }
         });
 
       

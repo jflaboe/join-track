@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Grid, Button, Dialog, DialogTitle, DialogContentText, List, ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
+import { Container, Grid, Button, Dialog, DialogTitle, DialogContentText, DialogActions, List, ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
 import DirectionsRunIcon from '@material-ui/icons/DirectionsRun';
 
 export default function IMLeaguesScreen(props){
@@ -37,8 +37,9 @@ export default function IMLeaguesScreen(props){
                 <ListItem><ListItemIcon><DirectionsRunIcon /></ListItemIcon><ListItemText primary="Complete the Health History Questionnaire. This is necessary if you want to compete." /></ListItem>
               </List>
             </DialogContentText>
-            <Button color="primary" onClick={() => {window.location.replace("https://www.imleagues.com/spa/account/login")}} variant='contained'>Proceed to IMLeagues</Button>
-            
+            <DialogActions>
+              <Button color="primary" onClick={() => {window.location.replace("https://www.imleagues.com/spa/account/login")}} variant='contained'>Proceed to IMLeagues</Button>
+            </DialogActions>
           </Dialog>
         </Container>
   )

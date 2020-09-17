@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { joinListserv } from './Actions'
 import { setCookie } from './CookieUtil'
-import { Container, Grid, Button, TextField, withStyles, Dialog, DialogTitle, DialogContentText, List, ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
+import { Container, Grid, Button, TextField, withStyles, Dialog, DialogTitle, DialogContentText, DialogActions, List, ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
 import DirectionsRunIcon from '@material-ui/icons/DirectionsRun';
 
 var NewButton = withStyles({
@@ -58,8 +58,9 @@ export default function EmailSignup(props) {
                 <ListItem><ListItemIcon><DirectionsRunIcon /></ListItemIcon><ListItemText primary="The google authorization data you provide will be used as verification of your Northwestern student identity in later steps." /></ListItem>
               </List>
             </DialogContentText>
-            <Button color="primary" onClick={() => {joinListserv(firstName, lastName, props.onCompletion)}} variant='contained'>Continue</Button>
-            
+            <DialogActions>
+              <Button color="primary" onClick={() => {joinListserv(firstName, lastName, props.onCompletion)}} variant='contained'>Continue</Button>
+            </DialogActions>
           </Dialog>
         </Container>
       );

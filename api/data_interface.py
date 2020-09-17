@@ -14,7 +14,8 @@ class DataInterface:
             self.db = DATABASE_FILE
         try:
             #connects to the database
-            self.conn = sqlite3.connect(self.db)
+            #had to add the check_same_thread to get this to work
+            self.conn = sqlite3.connect(self.db, check_same_thread=False)
             self.is_connected = True
             self.create_db()
         except Exception as e:
