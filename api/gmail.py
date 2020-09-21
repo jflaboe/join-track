@@ -3,6 +3,9 @@ import json
 from flask import Flask, request, make_response
 import private_gmail
 from data_interface import *
+import logging
+
+logging.basicConfig(format='%(asctime)s %(message)s', filename='jointrack.log', level=logging.DEBUG)
 
 app = Flask(__name__)
 
@@ -11,7 +14,7 @@ DATABASE = DataInterface()
 def get_email_address(access_token):
     resp = requests.get("https://www.googleapis.com/oauth2/v1/userinfo?alt=json", headers={"Authorization": "Bearer {}".format(access_token)})
     content = json.loads(resp.content)
-    print(content)
+    logging.debug(content)
     return content['email']
     
 
@@ -21,11 +24,12 @@ def verify_nu_email_address(user_email):
 
 @app.route('/addtolistserv', methods = ['POST', 'OPTIONS'])
 def add_to_listserv():
+    logging.info("Called addtolistserv")
     if request.method == 'OPTIONS':
         resp = make_response("Proceed", 200)
         resp.headers['Access-Control-Allow-Origin'] = "*"
         return resp
-    print(json.loads(request.data))
+    logging.debug(json.loads(request.data))
     req_data = json.loads(request.data)
 
     
@@ -54,7 +58,7 @@ def add_to_listserv():
         return resp
     
     except Exception as e:
-        print(e)
+        logging.warning(e)
         resp = make_response("Auth failed", 404)
         resp.headers['Access-Control-Allow-Origin'] = "*"
         return resp
@@ -63,6 +67,7 @@ def add_to_listserv():
 
 @app.route('/addtogroupme', methods = ['POST', 'OPTIONS'])
 def add_to_gm():
+    logging.info("Called addtogroupme")
 
     if request.method == 'OPTIONS':
         resp = make_response("Proceed", 200)
@@ -95,6 +100,7 @@ def add_to_gm():
     print(user_info)
     user_name = user_info['name']
     gm_id = user_info['id']
+    email = user_info['email']
 
     if DATABASE.is_blacklisted(email_address) or DATABASE.is_blacklisted(gm_id):
         resp = make_response("You are not authorized to use this page due to past behavior", 403)
@@ -106,14 +112,14 @@ def add_to_gm():
         "members": [
             {
                 "nickname": user_name,
-                "user_id": gm_id
+                "email": email
             }
         ]
     }
     r2 = requests.post("https://api.groupme.com/v3/groups/60786308/members/add?token=81074000d5b4013710310a666913ee8d", data=json.dumps(add_obj))
 
-    print(r2)
-    print(r2.content)
+    logging.debug(r2)
+    logging.debug(r2.content)
 
     DATABASE.add_event(email_address, gm_id)
     resp = make_response("Success", 200)
@@ -122,12 +128,13 @@ def add_to_gm():
 
 @app.route('/verifyadmin', methods = ['POST', 'OPTIONS'])
 def verifyAdmin():
+    logging.info("Called verifyadmin")
     if request.method == 'OPTIONS':
         resp = make_response("Proceed", 200)
         resp.headers['Access-Control-Allow-Origin'] = "*"
         return resp
 
-    print(json.loads(request.data))
+    logging.debug(json.loads(request.data))
     
     req_data = json.loads(request.data)
     try:
@@ -139,7 +146,7 @@ def verifyAdmin():
 
     email_address = get_email_address(goog__token)
     is_admin = DATABASE.is_admin(email_address)
-    print(is_admin)
+    logging.debug(is_admin)
     resp = make_response(json.dumps(is_admin), 200)
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
@@ -147,12 +154,13 @@ def verifyAdmin():
 ##below are all admin actions
 @app.route('/viewadmin', methods = ['POST', 'OPTIONS'])
 def viewAdmin():
+    logging.info("Called viewadmin")
     if request.method == 'OPTIONS':
         resp = make_response("Proceed", 200)
         resp.headers['Access-Control-Allow-Origin'] = "*"
         return resp
 
-    print(json.loads(request.data))
+    logging.debug(json.loads(request.data))
     
     req_data = json.loads(request.data)
     try:
@@ -175,12 +183,13 @@ def viewAdmin():
 
 @app.route('/addadmin', methods = ['POST', 'OPTIONS'])
 def addAdmin():
+    logging.info("Called addadmin")
     if request.method == 'OPTIONS':
         resp = make_response("Proceed", 200)
         resp.headers['Access-Control-Allow-Origin'] = "*"
         return resp
 
-    print(json.loads(request.data))
+    logging.debug(json.loads(request.data))
     
     req_data = json.loads(request.data)
     try:
@@ -209,12 +218,13 @@ def addAdmin():
 
 @app.route('/viewblacklist', methods = ['POST', 'OPTIONS'])
 def viewBlacklist():
+    logging.info("Called viewblacklist")
     if request.method == 'OPTIONS':
         resp = make_response("Proceed", 200)
         resp.headers['Access-Control-Allow-Origin'] = "*"
         return resp
 
-    print(json.loads(request.data))
+    logging.debug(json.loads(request.data))
     
     req_data = json.loads(request.data)
     try:
@@ -237,12 +247,13 @@ def viewBlacklist():
 
 @app.route('/addtoblacklist', methods = ['POST', 'OPTIONS'])
 def addToBlacklist():
+    logging.info("Called addtoblacklist")
     if request.method == 'OPTIONS':
         resp = make_response("Proceed", 200)
         resp.headers['Access-Control-Allow-Origin'] = "*"
         return resp
 
-    print(json.loads(request.data))
+    logging.debug(json.loads(request.data))
     
     req_data = json.loads(request.data)
     try:
@@ -267,12 +278,13 @@ def addToBlacklist():
 
 @app.route('/remfromblacklist', methods = ['POST', 'OPTIONS'])
 def remFromBlacklist():
+    logging.info("Called remfromblacklist")
     if request.method == 'OPTIONS':
         resp = make_response("Proceed", 200)
         resp.headers['Access-Control-Allow-Origin'] = "*"
         return resp
 
-    print(json.loads(request.data))
+    logging.debug(json.loads(request.data))
     
     req_data = json.loads(request.data)
     try:
@@ -296,12 +308,13 @@ def remFromBlacklist():
 
 @app.route('/listevents', methods = ['POST', 'OPTIONS'])
 def listEvents():
+    logging.info("Called listevents")
     if request.method == 'OPTIONS':
         resp = make_response("Proceed", 200)
         resp.headers['Access-Control-Allow-Origin'] = "*"
         return resp
     
-    print(json.loads(request.data))
+    logging.debug(json.loads(request.data))
     req_data = json.loads(request.data)
     try:
         goog_token = req_data['googleAccessToken']
