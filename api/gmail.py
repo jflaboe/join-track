@@ -100,6 +100,7 @@ def add_to_gm():
     print(user_info)
     user_name = user_info['name']
     gm_id = user_info['id']
+    email = user_info['email']
 
     if DATABASE.is_blacklisted(email_address) or DATABASE.is_blacklisted(gm_id):
         resp = make_response("You are not authorized to use this page due to past behavior", 403)
@@ -111,7 +112,7 @@ def add_to_gm():
         "members": [
             {
                 "nickname": user_name,
-                "user_id": gm_id
+                "email": email
             }
         ]
     }
