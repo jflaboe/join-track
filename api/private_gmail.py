@@ -19,12 +19,12 @@ import json
 APP_CREDENTIALS = 'credentials.json'
 SCOPES = ['https://www.googleapis.com/auth/gmail.compose']
 
-def set_credentials(token, id_token):
+def set_credentials(token, refresh_token, id_token):
     config = json.load(APP_CREDENTIALS)
     creds = Credentials(
         token,
         id_token=id_token,
-        refresh_token=None,
+        refresh_token=refresh_token,
         token_uri=config['web']["token_uri"],
         client_secret=config['web']['client_secret'],
         client_id=config['web']['client_id'],
