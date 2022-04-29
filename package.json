@@ -10,7 +10,7 @@
     "@testing-library/user-event": "^7.1.2",
     "gapi-script": "^1.0.2",
     "js-base64": "^2.6.1",
-    "postcss": "^8.4.12",
+    "postcss": "^7.0.36",
     "react": "^16.13.1",
     "react-app-env": "^1.2.3",
     "react-dom": "^16.13.1",
