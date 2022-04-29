@@ -14,35 +14,36 @@ import mimetypes
 import os
 from google.auth.credentials import Credentials
 import json
+import boto3
 
 
 APP_CREDENTIALS = 'credentials.json'
 SCOPES = ['https://www.googleapis.com/auth/gmail.compose']
+CREDENTIALS_BUCKET = os.environ.get("JOINTRACK_CREDENTIALS_BUCKET")
+CREDENTIALS_KEY = os.environ.get("JOINTRACK_CREDENTIALS_KEY")
 
-def set_credentials(token, refresh_token, id_token):
-    config = json.load(APP_CREDENTIALS)
-    creds = Credentials(
-        token,
-        id_token=id_token,
-        refresh_token=refresh_token,
-        token_uri=config['web']["token_uri"],
-        client_secret=config['web']['client_secret'],
-        client_id=config['web']['client_id'],
-        scopes=SCOPES
-    )
+s3 = boto3.client("s3")
 
-    with open('token.pickle', 'wb') as tokenfile:
-        pickle.dump(creds, tokenfile)
+def get_creds():
+    try:
+        resp = s3.get_object(Bucket=CREDENTIALS_BUCKET, Key=CREDENTIALS_KEY)
+        if not 'Body' in resp:
+            raise Exception("Object does not exist")
+        creds = pickle.loads(resp['Body'].read())
+    except Exception as e:
+        return None
 
-def refresh_credentials():
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
-    
-    creds.refresh(Request())
-    with open('token.pickle', 'wb') as tokenfile:
-        pickle.dump(creds, tokenfile)
+    if not creds.valid and creds.expired and creds.refresh_token:
+        creds.refresh(Request())
+        set_creds(creds)
 
+    return creds
+
+def set_creds(creds):
+    s3.put_object(
+            Bucket=CREDENTIALS_BUCKET,
+            Key=CREDENTIALS_KEY,
+            Body=pickle.dumps(creds))
 
 def create_message(sender, to, subject, message_text):
     """Create a message for an email.
@@ -92,13 +93,8 @@ def send_email(user_email, user_first, user_last):
     """Shows basic usage of the Gmail API.
     Lists the user's Gmail labels.
     """
-    creds = None
-    # The file token.pickle stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
+    creds = get_creds()
+
     # If there are no (valid) credentials available, let the user log in.
     print(creds)
     if not creds or not creds.valid:
@@ -106,11 +102,10 @@ def send_email(user_email, user_first, user_last):
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+                APP_CREDENTIALS, SCOPES)
             creds = flow.run_local_server(port=3030)
         # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
+        set_creds(creds)
 
     service = build('gmail', 'v1', credentials=creds)
 
@@ -120,6 +115,7 @@ def send_email(user_email, user_first, user_last):
     email = create_message(my_address, "listserv@listserv.it.northwestern.edu", "", "ADD TRACK {} {} {}".format(user_email, user_first, user_last))
     print('hi')
     result = send_message(service, "me", email)
+    print(result)
     return result
 
 

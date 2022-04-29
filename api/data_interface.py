@@ -1,124 +1,210 @@
-import sqlite3
-from sqlite3 import Error
+import boto3
 import json
 import datetime
 
-DATABASE_FILE = "jointrack.db"
+DYNAMO_TABLE = "jointrack-db"
+TEST_SUFFIX = "-test"
+
+dynamo = boto3.client("dynamodb", region_name="us-east-2")
+
+
+def dynamo_to_dict(dynamo_response):
+    def unmarshal(dynamo_map):
+        result = {}
+        for k, v in dynamo_map.items():
+            if 'M' in v:
+                result[k] = unmarshal(v['M'])
+            elif 'S' in v:
+                result[k] = v['S']
+            elif 'N' in v:
+                result[k] = int(v['N'])
+            elif 'BOOL' in v:
+                result[k] = v['BOOL']
+            elif 'SS' in v:
+                result[k] = list(v['SS'])
+            elif 'L' in v:
+                l = []
+                print(v['L'])
+                for item in v['L']:
+                    l.append(item['S'])
+                result[k]=l
+
+        return result
+    
+    return unmarshal(dynamo_response['Item'])
 
 class DataInterface:
     def __init__(self, test=False):
-        self.is_connected = False
+        self.is_test = test
         if test is True:
-            self.db = ":memory:"
+            self.db = DYNAMO_TABLE + TEST_SUFFIX
         else:
-            self.db = DATABASE_FILE
-        try:
-            #connects to the database
-            #had to add the check_same_thread to get this to work
-            self.conn = sqlite3.connect(self.db, check_same_thread=False)
-            self.is_connected = True
-            self.create_db()
-        except Exception as e:
-            print(e)
-
-    
-    def create_db(self):
-        query = """CREATE TABLE IF NOT EXISTS user_added (
-            EMAIL TEXT NOT NULL,
-            GM_ID TEXT NOT NULL,
-            ADD_DATE INTEGER NOT NULL
-        );"""
-        c = self.conn.cursor()
-        c.execute(query)
-        #commits the changes to the database
-        self.conn.commit()
+            self.db = DYNAMO_TABLE
         
-        query = """CREATE TABLE IF NOT EXISTS admin (
-            EMAIL TEXT NOT NULL
-        );"""
-        c = self.conn.cursor()
-        c.execute(query)
-        self.conn.commit()
-
-        query = """CREATE TABLE IF NOT EXISTS blacklist (
-            ID TEXT NOT NULL,
-            ID_TYPE TEXT NOT NULL
-        );"""
-        c = self.conn.cursor()
-        c.execute(query)
-        self.conn.commit()
-
     def list_events(self):
-        query = """SELECT * FROM user_added;"""
-        #fetchall returns a list of tuples
-        result = self.conn.cursor().execute(query).fetchall()
-        return [list(r) for r in result]
+        resp = dynamo.get_item(
+            TableName=self.db,
+            Key={
+                'field': {
+                    'S': 'events'
+                }
+            }
+        )
+        
+        events = dynamo_to_dict(resp)
+        print(events)
+        for i in range(len(events['eventlist'])):
+            events['eventlist'][i] = json.loads(events['eventlist'][i])
+        return events['eventlist']
 
     #returns True if the user email belongs to an admin
     def is_admin(self, user_email):
-        query = """SELECT * FROM admin
-            WHERE EMAIL = :email;"""
-        #the cursor() allows us to invoke methods that execute SQLite statements
-        #.fetchone() should return None if the email is not found.
-        result = self.conn.cursor().execute(query, {'email': user_email}).fetchone()
-        return result is not None
+        resp = dynamo.get_item(
+            TableName=self.db,
+            Key={
+                'field': {
+                    'S': 'admins'
+                }
+            }
+        )
+        data = dynamo_to_dict(resp)
+        if user_email in data['admins']:
+            return True
+
+        return False
 
     #adds an entry to user_added. Time is the unix timestamp in seconds
     def add_event(self, email_address, groupme_id):
         #uhh so i looked up a unix time converter and this seems to be
         #a few hours ahead? idk
         curr_time = datetime.datetime.utcnow().timestamp()
-        query = """INSERT INTO user_added (EMAIL, GM_ID, ADD_DATE)
-            VALUES (:email, :gm_id, :time);"""
-        c = self.conn.cursor()
-        c.execute(query, {'email': email_address, 'gm_id': groupme_id, 'time': curr_time})
-        self.conn.commit()
-        return
+
+        event = {'email': email_address, 'gm_id': groupme_id, 'time': curr_time}
+        #create request
+        update_expression = "SET eventlist = list_append(eventlist, :e)"
+        expression_attribute_values = {
+            ":e": {
+                "L": [
+                    {"S": json.dumps(event)}
+                ]
+            }
+        }
+        dynamo.update_item(
+            TableName=self.db,
+            Key={
+                'field': {
+                    'S': 'events'
+                }
+            },
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=expression_attribute_values)
+
 
     def add_admin(self, email_address):
-        with self.conn: #within the context manager, so don't need to commit afterwards
-            query = """INSERT INTO admin VALUES (:email);"""
-            c = self.conn.cursor()
-            c.execute(query, {'email': email_address})
-            #self.conn.commit()
-        return
+        update_expression = "ADD admins :a"
+        expression_attribute_values = {
+            ":a": {
+                "SS": [email_address]
+            }
+        }
+        dynamo.update_item(
+            TableName=self.db,
+            Key={
+                'field': {
+                    'S': 'admins'
+                }
+            },
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=expression_attribute_values)
 
     def remove_admin(self, email_address):
-        with self.conn:
-            query = """DELETE FROM admin WHERE EMAIL = :email;"""
-            c = self.conn.cursor()
-            c.execute(query, {'email': email_address})
-        return
+        update_expression = "DELETE admins :a"
+        expression_attribute_values = {
+            ":a": {
+                "SS": [email_address]
+            }
+        }
+        dynamo.update_item(
+            TableName=self.db,
+            Key={
+                'field': {
+                    'S': 'admins'
+                }
+            },
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=expression_attribute_values)
+
 
     def list_admin(self):
-        query = """SELECT * FROM admin;"""
-        result = self.conn.cursor().execute(query).fetchall()
-        #fetcall returns a list of tuples. convert them to lists, then
-        ##make it into a regular list since there's only one field (email)
-        return [list(r)[0] for r in result]
+        resp = dynamo.get_item(
+            TableName=self.db,
+            Key={
+                'field': {
+                    'S': 'admins'
+                }
+            }
+        )
+        data = dynamo_to_dict(resp)
+        return data['admins']
 
     def list_blacklist(self):
-        query = """SELECT * FROM blacklist;"""
-        result = self.conn.cursor().execute(query).fetchall()
-        return [list(r) for r in result]
+        resp = dynamo.get_item(
+            TableName=self.db,
+            Key={
+                'field': {
+                    'S': 'blacklist'
+                }
+            }
+        )
+        data = dynamo_to_dict(resp)
+        return data['blacklist']
 
     def add_to_blacklist(self, user_id, ban_type="email"):
-        with self.conn: #within the context manager, so don't need to commit afterwards
-            query = """INSERT INTO blacklist (ID, ID_TYPE) 
-                VALUES (:id, :id_type);"""
-            c = self.conn.cursor()
-            c.execute(query, {'id': user_id, 'id_type': ban_type})
-        return
+        update_expression = "ADD blacklist :a"
+        expression_attribute_values = {
+            ":a": {
+                "SS": [user_id]
+            }
+        }
+        dynamo.update_item(
+            TableName=self.db,
+            Key={
+                'field': {
+                    'S': 'blacklist'
+                }
+            },
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=expression_attribute_values)
 
     def remove_from_blacklist(self, user_id):
-        with self.conn:
-            query = """DELETE FROM blacklist WHERE ID = :id;"""
-            c = self.conn.cursor()
-            c.execute(query, {'id': user_id})
-        return
+        update_expression = "DELETE blacklist :a"
+        expression_attribute_values = {
+            ":a": {
+                "SS": [user_id]
+            }
+        }
+        dynamo.update_item(
+            TableName=self.db,
+            Key={
+                'field': {
+                    'S': 'blacklist'
+                }
+            },
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=expression_attribute_values)
 
     def is_blacklisted(self, user_id, ban_type="email"):
-        query = """SELECT * FROM blacklist WHERE ID = :id AND ID_TYPE = :id_type;"""
-        result = self.conn.cursor().execute(query, {'id': user_id, 'id_type': ban_type}).fetchone()
-        return result is not None
+        resp = dynamo.get_item(
+            TableName=self.db,
+            Key={
+                'field': {
+                    'S': 'blacklist'
+                }
+            }
+        )
+        data = dynamo_to_dict(resp)
+        if user_id in data['blacklist']:
+            return True
+
+        return False
 

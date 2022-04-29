@@ -197,6 +197,7 @@ export default function Admin() {
       if (resp.ok) {
         console.log('Success');
         var events = await resp.json();
+        console.log(events)
         setEventInfo(events);
         setEventDialogOpen(true);
       } else {
@@ -366,8 +367,8 @@ export default function Admin() {
                 <TableBody>
                   {blacklistInfo.map((row, i) => (
                     <TableRow key={i}>
-                      <TableCell align="left">{row[0]}</TableCell>
-                      <TableCell align="right">{row[1]}</TableCell>
+                      <TableCell align="left">{row}</TableCell>
+                      <TableCell align="right">{"N/A"}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -400,9 +401,9 @@ export default function Admin() {
                 <TableBody>
                   {eventInfo.map((row, i) => (
                     <TableRow key={i}>
-                      <TableCell align="left">{row[0]}</TableCell>
-                      <TableCell align="left">{row[1]}</TableCell>
-                      <TableCell align="left">{row[2]}</TableCell>
+                      <TableCell align="left">{row.email}</TableCell>
+                      <TableCell align="left">{row.gm_id}</TableCell>
+                      <TableCell align="left">{(new Date(row.time*1000 - 5*60*60*1000)).toLocaleString()}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

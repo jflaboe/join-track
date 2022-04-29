@@ -4,3 +4,4 @@ __pycache__
 credentials.json
 token.pickle
 admin.py
+.plu.env
