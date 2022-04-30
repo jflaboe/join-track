@@ -11,7 +11,7 @@ def lambda_handler(event, context):
     print(event)
     if is_options_request(event):
         result = {
-            "code": 200
+            "statusCode": 200
         }
     elif is_post_request(event):
         path = get_path(event)
@@ -22,7 +22,7 @@ def lambda_handler(event, context):
         except Exception as e:
             print(e)
             result = {
-                "code": 500,
+                "statusCode": 500,
                 "body": "Invalid Path"
             }
     print(result)
@@ -42,7 +42,7 @@ def add_to_listserv(req_data):
 
         if DATABASE.is_blacklisted(email):
             return {
-                "code": 403,
+                "statusCode": 403,
                 "body": "You are not authorized to use this page due to past behavior"
             }
 
@@ -52,14 +52,14 @@ def add_to_listserv(req_data):
             raise Exception('failed to send message')
         print("RETURN")
         return {
-            "code": 200,
+            "statusCode": 200,
             "body": "Email success"
         }
     
     except Exception as e:
         print(e)
         return {
-            "code": 404,
+            "statusCode": 404,
             "body": "Auth failed"
         }
 
@@ -71,14 +71,14 @@ def add_to_gm(req_data):
         gm_access_token = req_data['gmAccessToken']
     except:
         return {
-            "code": 400,
+            "statusCode": 400,
             "body": "The following fields are required: googleAccessToken, gmAccessToken"
         }
 
     email_address = get_email_address(goog_access_token)
     if not verify_nu_email_address(email_address):
         return {
-            "code": 400,
+            "statusCode": 400,
             "body": "A @u.northwestern.edu email address is required"
         }
 
@@ -92,7 +92,7 @@ def add_to_gm(req_data):
 
     if DATABASE.is_blacklisted(email_address) or DATABASE.is_blacklisted(gm_id):
         return {
-            "code": 403,
+            "statusCode": 403,
             "body": "You are not authorized to use this page due to past behavior"
         }
 
@@ -112,7 +112,7 @@ def add_to_gm(req_data):
 
     DATABASE.add_event(email_address, gm_id)
     return {
-            "code": 200,
+            "statusCode": 200,
             "body": "Success"
         }
 
@@ -122,7 +122,7 @@ def verify_admin(req_data):
         goog__token = req_data['googleAccessToken']
     except:
         return {
-            "code": 400,
+            "statusCode": 400,
             "body": "The following fields are required: googleAccessToken"
         }
 
@@ -130,7 +130,7 @@ def verify_admin(req_data):
     is_admin = DATABASE.is_admin(email_address)
 
     return {
-            "code": 200,
+            "statusCode": 200,
             "body": json.dumps(is_admin)
         }
 
@@ -141,20 +141,20 @@ def view_admin(req_data):
         goog__token = req_data['googleAccessToken']
     except:
         return {
-            "code": 400,
+            "statusCode": 400,
             "body": "The following fields are required: googleAccessToken"
         }
 
     admin_email = get_email_address(goog__token)
     if DATABASE.is_admin(admin_email) is False:
         return {
-            "code": 400,
+            "statusCode": 400,
             "body": "You are not authorized to perform this action"
         }
 
     admin = DATABASE.list_admin()
     return {
-            "code": 200,
+            "statusCode": 200,
             "body": json.dumps(admin)
         }
 
@@ -165,27 +165,27 @@ def add_admin(req_data):
         user_email = req_data['userEmail']
     except:
         return {
-            "code": 400,
+            "statusCode": 400,
             "body": "The following fields are required: googleAccessToken, userEmail"
         }
 
     #first verify that the email is a valid nu email
     if not verify_nu_email_address(user_email):
         return {
-            "code": 400,
+            "statusCode": 400,
             "body": "Admins must have a @u.northwestern.edu email"
         }
 
     admin_email = get_email_address(goog_token)
     if DATABASE.is_admin(admin_email) is False:
         return {
-            "code": 400,
+            "statusCode": 400,
             "body": "You are not authorized to perform this action"
         }
     
     DATABASE.add_admin(user_email)
     return {
-        "code": 200,
+        "statusCode": 200,
         "body": "Success"
     }
 
@@ -195,20 +195,20 @@ def view_blacklist(req_data):
         goog_token = req_data['googleAccessToken']
     except:
         return {
-            "code": 400,
+            "statusCode": 400,
             "body": "The following fields are required: googleAccessToken"
         }
     
     admin_email = get_email_address(goog_token)
     if DATABASE.is_admin(admin_email) is False:
         return {
-            "code": 400,
+            "statusCode": 400,
             "body": "You are not authorized to perform this action"
         }
 
     blacklist = DATABASE.list_blacklist()
     return {
-            "code": 200,
+            "statusCode": 200,
             "body": json.dumps(blacklist)
         }
 
@@ -220,20 +220,20 @@ def add_to_blacklist(req_data):
         id_type = req_data['idType']
     except:
         return {
-            "code": 400,
+            "statusCode": 400,
             "body": "The following fields are required: googleAccessToken, userID, idType"
         }
 
     admin_email = get_email_address(goog_token)
     if DATABASE.is_admin(admin_email) is False:
         return {
-            "code": 400,
+            "statusCode": 400,
             "body": "You are not authorized to perform this action"
         }
 
     DATABASE.add_to_blacklist(user_id, id_type)
     return {
-            "code": 200,
+            "statusCode": 200,
             "body": "Success"
         }
 
@@ -244,20 +244,20 @@ def rem_from_blacklist(req_data):
         user_id = req_data['userID']
     except:
         return {
-            "code": 400,
+            "statusCode": 400,
             "body": "The following fields are required: googleAccessToken, userId"
         }
     
     admin_email = get_email_address(goog_token)
     if DATABASE.is_admin(admin_email) is False:
         return {
-            "code": 400,
+            "statusCode": 400,
             "body": "You are not authorized to perform this action"
         }
     
     DATABASE.remove_from_blacklist(user_id)
     return {
-            "code": 200,
+            "statusCode": 200,
             "body": "Success"
         }
 
@@ -267,20 +267,20 @@ def list_events(req_data):
         goog_token = req_data['googleAccessToken']
     except:
         return {
-            "code": 400,
+            "statusCode": 400,
             "body": "The following fields are required: googleAccessToken, userEmail"
         }
     
     admin_email = get_email_address(goog_token)
     if DATABASE.is_admin(admin_email) is False:
         return {
-            "code": 400,
+            "statusCode": 400,
             "body": "You are not authorized to perform this action"
         }
     
     events = DATABASE.list_events()
     return {
-            "code": 200,
+            "statusCode": 200,
             "body": json.dumps(events)
         }
 

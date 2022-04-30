@@ -403,7 +403,7 @@ export default function Admin() {
                     <TableRow key={i}>
                       <TableCell align="left">{row.email}</TableCell>
                       <TableCell align="left">{row.gm_id}</TableCell>
-                      <TableCell align="left">{(new Date(row.time*1000 - 5*60*60*1000)).toLocaleString()}</TableCell>
+                      <TableCell align="left">{(new Date(row.time*1000)).toLocaleString()}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
